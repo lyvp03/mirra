@@ -1,0 +1,44 @@
+{
+  "model": "sonnet",
+  "outputStyle": "Explanatory",
+  "permissions": {
+    "allow": [
+      "Bash(uv run *)",
+      "Bash(uvx ruff *)",
+      "Bash(docker compose *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git status *)"
+    ],
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Bash(git push --force *)",
+      "Bash(rm -rf *)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect_paths.py\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/ruff_format.py\""
+          }
+        ]
+      }
+    ]
+  }
+}
