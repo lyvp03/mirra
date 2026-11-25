@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  ai_service:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ai_service
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres_ci
+          POSTGRES_DB: mirra
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d mirra"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+
+    env:
+      AI_DB_PASSWORD: mirra_ai_ci
+      DATABASE_URL: postgresql+asyncpg://mirra_ai:mirra_ai_ci@127.0.0.1:5432/mirra
+      TEST_DATABASE_URL: postgresql+asyncpg://mirra_ai:mirra_ai_ci@127.0.0.1:5432/mirra_test
+      REDIS_URL: redis://127.0.0.1:6379/0
+      TEST_REDIS_URL: redis://127.0.0.1:6379/15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.19"
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --locked
+
+      - name: Ruff
+        run: |
+          uv run ruff check
+          uv run ruff format --check
+
+      - name: Import contracts
+        run: uv run lint-imports
+
+      - name: Unit tests
+        run: uv run pytest -m "not integration"
+
+      # Same bootstrap as dev (docker-entrypoint-initdb.d), so CI also runs as the limited role mirra_ai.
+      - name: Bootstrap database (superuser)
+        env:
+          PGHOST: localhost
+          PGPASSWORD: postgres_ci
+          POSTGRES_USER: postgres
+          POSTGRES_DB: mirra
+        run: bash ../docker/postgres/init-ai.sh
+
+      - name: Migrate
+        run: uv run alembic upgrade head
+
+      - name: Integration tests
+        run: uv run pytest -m integration
