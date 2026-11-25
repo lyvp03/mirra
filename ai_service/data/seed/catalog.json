@@ -1,0 +1,77 @@
+{
+  "_comment": "Provisional fixture for FakeCoreApiClient. B5/B6 do not list the fields of GET /products/{slug}; align with core-api when it exists (docs/plans/skeleton.md 8.6). Prices are integer VND.",
+  "products": [
+    {
+      "id": "0b9a3c1e-1f2a-4c5d-8e7f-000000000001",
+      "slug": "dam-midi-hoa-nhi",
+      "name": "Đầm midi hoa nhí",
+      "category": "dam",
+      "price": 459000,
+      "variants": [
+        {"id": "5a1d0c2b-0000-4000-8000-000000000101", "color": "Trắng", "size": "S", "in_stock": true, "effective_price": 459000},
+        {"id": "5a1d0c2b-0000-4000-8000-000000000102", "color": "Trắng", "size": "M", "in_stock": true, "effective_price": 459000},
+        {"id": "5a1d0c2b-0000-4000-8000-000000000103", "color": "Hồng", "size": "M", "in_stock": false, "effective_price": 459000}
+      ],
+      "images": ["products/dam-midi-hoa-nhi/1.jpg"]
+    },
+    {
+      "id": "0b9a3c1e-1f2a-4c5d-8e7f-000000000002",
+      "slug": "ao-so-mi-lua-tay-bong",
+      "name": "Áo sơ mi lụa tay bồng",
+      "category": "ao",
+      "price": 329000,
+      "variants": [
+        {"id": "5a1d0c2b-0000-4000-8000-000000000201", "color": "Kem", "size": "S", "in_stock": true, "effective_price": 299000},
+        {"id": "5a1d0c2b-0000-4000-8000-000000000202", "color": "Kem", "size": "L", "in_stock": true, "effective_price": 299000}
+      ],
+      "images": ["products/ao-so-mi-lua-tay-bong/1.jpg"]
+    },
+    {
+      "id": "0b9a3c1e-1f2a-4c5d-8e7f-000000000003",
+      "slug": "quan-ong-rong-cap-cao",
+      "name": "Quần ống rộng cạp cao",
+      "category": "quan",
+      "price": 389000,
+      "variants": [
+        {"id": "5a1d0c2b-0000-4000-8000-000000000301", "color": "Đen", "size": "M", "in_stock": true, "effective_price": 389000},
+        {"id": "5a1d0c2b-0000-4000-8000-000000000302", "color": "Be", "size": "M", "in_stock": true, "effective_price": 389000}
+      ],
+      "images": ["products/quan-ong-rong-cap-cao/1.jpg"]
+    },
+    {
+      "id": "0b9a3c1e-1f2a-4c5d-8e7f-000000000004",
+      "slug": "chan-vay-xep-ly",
+      "name": "Chân váy xếp ly",
+      "category": "vay",
+      "price": 279000,
+      "variants": [
+        {"id": "5a1d0c2b-0000-4000-8000-000000000401", "color": "Xanh navy", "size": "S", "in_stock": true, "effective_price": 279000}
+      ],
+      "images": ["products/chan-vay-xep-ly/1.jpg"]
+    },
+    {
+      "id": "0b9a3c1e-1f2a-4c5d-8e7f-000000000005",
+      "slug": "ao-khoac-blazer-dang-dai",
+      "name": "Áo khoác blazer dáng dài",
+      "category": "ao-khoac",
+      "price": 699000,
+      "variants": [
+        {"id": "5a1d0c2b-0000-4000-8000-000000000501", "color": "Ghi", "size": "M", "in_stock": true, "effective_price": 629000},
+        {"id": "5a1d0c2b-0000-4000-8000-000000000502", "color": "Ghi", "size": "L", "in_stock": false, "effective_price": 629000}
+      ],
+      "images": ["products/ao-khoac-blazer-dang-dai/1.jpg"]
+    },
+    {
+      "id": "0b9a3c1e-1f2a-4c5d-8e7f-000000000006",
+      "slug": "ao-thun-co-tron-basic",
+      "name": "Áo thun cổ tròn basic",
+      "category": "ao",
+      "price": 159000,
+      "variants": [
+        {"id": "5a1d0c2b-0000-4000-8000-000000000601", "color": "Trắng", "size": "S", "in_stock": true, "effective_price": 159000},
+        {"id": "5a1d0c2b-0000-4000-8000-000000000602", "color": "Đen", "size": "M", "in_stock": true, "effective_price": 159000}
+      ],
+      "images": ["products/ao-thun-co-tron-basic/1.jpg"]
+    }
+  ]
+}
