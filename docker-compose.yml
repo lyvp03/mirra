@@ -1,0 +1,61 @@
+# Dev infrastructure for Mirra (B3 5-2 container table). ai_service runs on the host with `uv run`.
+# Every variable has a default, so `docker compose up -d` works without a .env file (see .env.example).
+name: mirra
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-mirra}
+      AI_DB_PASSWORD: ${AI_DB_PASSWORD:-mirra_ai_dev}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      # Runs only when pg_data is empty. After changing it: docker compose down -v (drops dev data).
+      - ./docker/postgres/init-ai.sh:/docker-entrypoint-initdb.d/10-init-ai.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-mirra_minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-mirra_minio_dev}
+    ports:
+      - "127.0.0.1:${MINIO_PORT:-9000}:9000"
+      - "127.0.0.1:${MINIO_CONSOLE_PORT:-9001}:9001"  # console: dev only (B3 5-5)
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  pg_data:
+  redis_data:
+  minio_data:
