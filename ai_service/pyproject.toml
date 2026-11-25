@@ -1,0 +1,92 @@
+[project]
+name = "ai-service"
+version = "0.1.0"
+description = "Mirra ai_service: AI assistant, virtual try-on and semantic search (FastAPI + LangGraph)."
+readme = "README.md"
+authors = [
+    { name = "phgly", email = "ly.vp0511@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "alembic>=1.20.1",
+    "asyncpg>=0.32.0",
+    "fastapi>=0.162.5",
+    "httpx>=0.28.1",
+    "pydantic>=2.14.3",
+    "pydantic-settings>=2.16.2",
+    "pyjwt[crypto]>=2.15.1",
+    "redis>=8.1.0",
+    "sqlalchemy[asyncio]>=2.1.8",
+    "uvicorn>=0.54.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.19,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "import-linter>=2.16",
+    "pytest>=9.2.0",
+    "pytest-asyncio>=1.4.1",
+    "ruff>=0.17.4",
+]
+
+# --------------------------------------------------------------------------- ruff
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests", "migrations"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "C90", "SIM", "RUF", "ASYNC"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10  # B6 7.3: C901 threshold 10
+
+# --------------------------------------------------------------------------- pytest
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "integration: needs real Postgres and Redis (docker compose up -d)",
+]
+addopts = "-ra --strict-markers"
+
+# --------------------------------------------------------------------------- import-linter
+# Contracts from B3 2-3 (package diagram) and B6 7-3. Layers in parentheses are optional:
+# they do not exist yet in the walking skeleton and get checked as soon as they are created.
+[tool.importlinter]
+root_package = "ai_service"
+
+[[tool.importlinter.contracts]]
+name = "Layers: api -> services -> repositories -> models"
+type = "layers"
+containers = ["ai_service"]
+layers = ["api", "(services)", "(repositories)", "models"]
+
+[[tool.importlinter.contracts]]
+name = "core is the base layer: it never imports upper packages"
+type = "forbidden"
+source_modules = ["ai_service.core"]
+forbidden_modules = ["ai_service.api", "ai_service.adapters", "ai_service.models", "ai_service.eval"]
+
+[[tool.importlinter.contracts]]
+name = "adapters only depend on core"
+type = "forbidden"
+source_modules = ["ai_service.adapters"]
+forbidden_modules = ["ai_service.api", "ai_service.models", "ai_service.eval"]
+
+[[tool.importlinter.contracts]]
+name = "Runtime code never imports eval (fakes and fixtures are test-only, B3 2-3)"
+type = "forbidden"
+source_modules = [
+    "ai_service.main",
+    "ai_service.api",
+    "ai_service.core",
+    "ai_service.adapters",
+    "ai_service.models",
+]
+forbidden_modules = ["ai_service.eval"]
